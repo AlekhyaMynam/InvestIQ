@@ -1,0 +1,1 @@
+"""Synthesis package — CIO and future synthesis components."""

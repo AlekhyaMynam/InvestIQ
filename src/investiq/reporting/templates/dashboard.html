@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>InvestIQ - {{ ticker|e }} Decision Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-page: #F9F3EA;
+      --bg-card: #FFFDF9;
+      --bg-card-overlay: rgba(255, 255, 255, 0.72);
+      --hero-banner: linear-gradient(135deg, #E6C8A0 0%, #C86B2B 100%);
+      --text-hero: #1E120A;
+      --text-heading: #2B1F17;
+      --text-body: #524338;
+      --text-secondary: #8C7769;
+      --cta-btn: linear-gradient(135deg, #CF672A 0%, #AE4E1A 100%);
+      --cta-hover: #984113;
+      --search-bg: #FFFFFF;
+      --search-text: #2B1F17;
+      --search-placeholder: #A19388;
+      --indicator-positive: #2C7A4C;
+      --indicator-negative: #B93826;
+      --chart-accent: #D98032;
+      --border-card: 1px solid #F1E5D5;
+      --border-search: 1px solid #E5D5C3;
+      --border-divider: #EFE5D8;
+      --shadow-hero: 0px 20px 40px -15px rgba(200, 107, 43, 0.25);
+      --shadow-card: 0px 16px 32px -8px rgba(43, 31, 23, 0.08), 0px 4px 12px rgba(43, 31, 23, 0.04);
+      --shadow-btn: 0px 8px 18px rgba(207, 103, 42, 0.35);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-page);
+      color: var(--text-body);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .dashboard-container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 3rem 1.5rem 4rem;
+      width: 100%;
+      flex: 1;
+    }
+
+    /* Centered Hero Header & Logo Lockup */
+    .hero-section {
+      text-align: center;
+      margin-bottom: 2.75rem;
+      background: linear-gradient(180deg, rgba(230, 200, 160, 0.25) 0%, rgba(200, 107, 43, 0.06) 100%);
+      border: 1px solid rgba(230, 200, 160, 0.5);
+      border-radius: 24px;
+      padding: 2.75rem 2rem 2.25rem;
+      box-shadow: var(--shadow-hero);
+    }
+
+    .logo-lockup {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 0.65rem;
+    }
+
+    .logo-icon-box {
+      width: 54px;
+      height: 54px;
+      background: linear-gradient(140deg, #4f8dfa 0%, #8c52f6 100%);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 20px rgba(79, 141, 250, 0.35);
+      flex-shrink: 0;
+    }
+
+    .hero-title {
+      font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+      font-size: 3.25rem;
+      font-weight: 800;
+      letter-spacing: -0.035em;
+      line-height: 1;
+      margin: 0;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .brand-invest {
+      color: var(--text-hero);
+    }
+
+    .brand-iq {
+      color: #4F8DFA;
+    }
+
+    @media (max-width: 640px) {
+      .logo-icon-box {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+      }
+      .logo-icon-box svg {
+        width: 26px;
+        height: 26px;
+      }
+      .hero-title {
+        font-size: 2.4rem;
+      }
+      .hero-section {
+        padding: 2rem 1.25rem 1.75rem;
+      }
+    }
+
+    .hero-subtitle {
+      font-size: 1.05rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+      max-width: 660px;
+      margin: 0.35rem auto 1.5rem;
+      line-height: 1.5;
+    }
+
+    .title-divider {
+      width: 100%;
+      max-width: 680px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent 0%, var(--border-divider) 20%, var(--border-divider) 80%, transparent 100%);
+      margin: 1.25rem auto 2rem;
+    }
+
+    /* Centered Search Bar */
+    .search-container {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    .scope-badge-wrap {
+      margin-bottom: 1.15rem;
+      display: flex;
+      justify-content: center;
+    }
+
+    .scope-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #AE4E1A;
+      background: rgba(207, 103, 42, 0.08);
+      border: 1px solid rgba(207, 103, 42, 0.25);
+      padding: 0.35rem 0.9rem;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      letter-spacing: 0.75px;
+    }
+
+    .scope-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #CF672A;
+      box-shadow: 0 0 6px rgba(207, 103, 42, 0.5);
+    }
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      background: var(--search-bg);
+      border: var(--border-search);
+      border-radius: 9999px;
+      padding: 0.45rem 0.5rem 0.45rem 1.4rem;
+      gap: 0.75rem;
+      box-shadow: 0 8px 24px rgba(43, 31, 23, 0.06);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .search-box:focus-within {
+      border-color: #CF672A;
+      box-shadow: 0 0 0 4px rgba(207, 103, 42, 0.15), 0 8px 24px rgba(43, 31, 23, 0.08);
+    }
+
+    .search-icon {
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .search-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--search-text);
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 500;
+      width: 100%;
+    }
+
+    .search-input::placeholder {
+      color: var(--search-placeholder);
+    }
+
+    .search-btn {
+      background: var(--cta-btn);
+      color: #FFFFFF;
+      border: none;
+      border-radius: 9999px;
+      padding: 0.75rem 1.6rem;
+      font-weight: 700;
+      font-size: 0.92rem;
+      cursor: pointer;
+      box-shadow: var(--shadow-btn);
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .search-btn:hover {
+      background: var(--cta-hover);
+      box-shadow: 0 4px 14px rgba(152, 65, 19, 0.4);
+      transform: translateY(-1px);
+    }
+
+    .quick-chips-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-top: 1.25rem;
+    }
+
+    .chip-label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+
+    .chip {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-body);
+      background: #FFFFFF;
+      border: 1px solid #E5D5C3;
+      padding: 0.3rem 0.75rem;
+      border-radius: 9999px;
+      text-decoration: none;
+      transition: all 0.15s ease;
+    }
+
+    .chip:hover {
+      background: rgba(207, 103, 42, 0.08);
+      border-color: #CF672A;
+      color: #AE4E1A;
+    }
+
+    .chip.active {
+      background: var(--cta-btn);
+      border-color: #CF672A;
+      color: #FFFFFF;
+      box-shadow: 0 2px 8px rgba(207, 103, 42, 0.3);
+    }
+
+    /* State Panels */
+    .state-panel {
+      text-align: center;
+      padding: 4rem 1.5rem;
+      background: var(--bg-card);
+      border: 1px dashed #E5D5C3;
+      border-radius: 20px;
+      margin: 2rem 0;
+      box-shadow: var(--shadow-card);
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid #EFE5D8;
+      border-top-color: #CF672A;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 1.25rem;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loader-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-heading);
+      margin-bottom: 0.35rem;
+    }
+
+    .loader-sub {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    .error-card {
+      background: #FFFFFF;
+      border: 1px solid #B93826;
+      border-radius: 16px;
+      padding: 2.5rem 2rem;
+      max-width: 520px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .error-icon {
+      font-size: 2.4rem;
+      margin-bottom: 0.75rem;
+      color: #D98032;
+    }
+
+    .error-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: var(--text-heading);
+    }
+
+    .error-msg {
+      font-size: 0.85rem;
+      color: var(--text-body);
+      margin-bottom: 1rem;
+    }
+
+    .error-suggestion {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--border-divider);
+    }
+
+    /* Company Overview Card */
+    .company-header-card {
+      background: var(--bg-card);
+      border: var(--border-card);
+      border-radius: 20px;
+      padding: 1.5rem 1.75rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      box-shadow: var(--shadow-card);
+    }
+
+    .company-title-area {
+      flex: 1;
+      min-width: 240px;
+    }
+
+    .company-name {
+      font-size: 1.6rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: var(--text-heading);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .ticker-tag {
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 0.2rem 0.6rem;
+      background: rgba(207, 103, 42, 0.1);
+      border: 1px solid rgba(207, 103, 42, 0.3);
+      color: #AE4E1A;
+      border-radius: 9999px;
+    }
+
+    .company-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem 1.25rem;
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      margin-top: 0.5rem;
+    }
+
+    .meta-badge {
+      background: rgba(249, 243, 234, 0.7);
+      padding: 0.25rem 0.65rem;
+      border-radius: 6px;
+      border: 1px solid #EFE5D8;
+    }
+
+    .meta-badge b {
+      color: var(--text-heading);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+    }
+
+    .btn-secondary {
+      background: #FFFFFF;
+      border: 1px solid #E5D5C3;
+      color: var(--text-heading);
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 0.55rem 1.2rem;
+      border-radius: 9999px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      box-shadow: 0 2px 6px rgba(43, 31, 23, 0.04);
+    }
+
+    .btn-secondary:hover {
+      background: #F9F3EA;
+      border-color: #CF672A;
+      color: #CF672A;
+      box-shadow: 0 4px 12px rgba(207, 103, 42, 0.15);
+      transform: translateY(-1px);
+    }
+
+    /* Decision Matrix Section */
+    .decision-panel {
+      background: var(--bg-card);
+      border: var(--border-card);
+      border-radius: 20px;
+      padding: 1.5rem 1.75rem;
+      margin-bottom: 2rem;
+      box-shadow: var(--shadow-card);
+    }
+
+    .panel-header {
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.75px;
+      color: #AE4E1A;
+      margin-bottom: 1.25rem;
+    }
+
+    .decision-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .metric-card {
+      background: rgba(249, 243, 234, 0.65);
+      border: 1px solid #EFE5D8;
+      border-radius: 14px;
+      padding: 1.15rem 1rem;
+      text-align: center;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .metric-card:hover {
+      transform: translateY(-2px);
+      border-color: #D98032;
+      background: #FFFFFF;
+    }
+
+    .metric-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.75px;
+      color: var(--text-secondary);
+      margin-bottom: 0.4rem;
+    }
+
+    .metric-value {
+      font-size: 1.45rem;
+      font-weight: 800;
+      color: var(--text-heading);
+    }
+
+    .val-positive { color: var(--indicator-positive); }
+    .val-negative { color: var(--indicator-negative); }
+    .val-neutral  { color: #D98032; }
+
+    .badge-verdict {
+      display: inline-block;
+      padding: 0.35rem 0.85rem;
+      border-radius: 9999px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      text-transform: capitalize;
+    }
+
+    .badge-verdict.undervalued {
+      background: rgba(44, 122, 76, 0.12);
+      color: var(--indicator-positive);
+      border: 1px solid rgba(44, 122, 76, 0.25);
+    }
+
+    .badge-verdict.overvalued {
+      background: rgba(185, 56, 38, 0.12);
+      color: var(--indicator-negative);
+      border: 1px solid rgba(185, 56, 38, 0.25);
+    }
+
+    .badge-verdict.fairly-valued, .badge-verdict.fairlyvalued {
+      background: rgba(217, 128, 50, 0.12);
+      color: #D98032;
+      border: 1px solid rgba(217, 128, 50, 0.25);
+    }
+
+    .assessment-strip {
+      background: rgba(207, 103, 42, 0.06);
+      border: 1px solid rgba(207, 103, 42, 0.18);
+      border-radius: 12px;
+      padding: 0.85rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+      font-size: 0.9rem;
+    }
+
+    .assessment-title {
+      font-weight: 700;
+      color: var(--text-heading);
+    }
+
+    .assessment-val {
+      font-weight: 800;
+      color: #FFFFFF;
+      background: var(--cta-btn);
+      padding: 0.25rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      box-shadow: 0 2px 6px rgba(207, 103, 42, 0.25);
+    }
+
+    /* Content Sections */
+    .section-block {
+      margin-bottom: 2rem;
+    }
+
+    .section-heading {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-heading);
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border-divider);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .content-card {
+      background: var(--bg-card);
+      border: var(--border-card);
+      border-radius: 20px;
+      padding: 1.35rem 1.6rem;
+      line-height: 1.7;
+      color: var(--text-body);
+      font-size: 0.92rem;
+      box-shadow: var(--shadow-card);
+    }
+
+    /* Thesis Groups */
+    .thesis-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .thesis-box {
+      background: var(--bg-card);
+      border: var(--border-card);
+      border-radius: 18px;
+      padding: 1.35rem;
+      border-top: 3px solid #CF672A;
+      box-shadow: var(--shadow-card);
+    }
+
+    .thesis-box.strength { border-top-color: var(--indicator-positive); }
+    .thesis-box.concern  { border-top-color: var(--indicator-negative); }
+    .thesis-box.risk     { border-top-color: #D98032; }
+    .thesis-box.driver   { border-top-color: #4F8DFA; }
+    .thesis-box.breaker  { border-top-color: #8C52F6; }
+
+    .thesis-box-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.85rem;
+      color: var(--text-heading);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .thesis-list {
+      list-style: none;
+    }
+
+    .thesis-list li {
+      position: relative;
+      padding-left: 1.25rem;
+      margin-bottom: 0.65rem;
+      font-size: 0.88rem;
+      color: var(--text-body);
+      line-height: 1.55;
+    }
+
+    .thesis-list li::before {
+      content: "\2022";
+      position: absolute;
+      left: 0;
+      color: #CF672A;
+      font-weight: bold;
+      font-size: 1.1rem;
+      line-height: 1;
+    }
+
+    /* Footer */
+    .dashboard-footer {
+      border-top: 1px solid var(--border-divider);
+      padding: 1.75rem 1.5rem;
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 0.78rem;
+      font-weight: 500;
+    }
+
+    .footer-devel-label {
+      margin-top: 0.4rem;
+      font-size: 0.65rem;
+      font-weight: 400;
+      color: var(--text-secondary);
+      opacity: 0.6;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Main Container -->
+  <main class="dashboard-container">
+
+    <!-- Centered Hero Title & Subtitle: InvestIQ -->
+    <section class="hero-section">
+      <div class="logo-lockup">
+        <div class="logo-icon-box">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4.5 7.5v9a2 2 0 0 0 2 2h12"></path>
+            <path d="M8.5 13.5l3.2-3.2 3 3 4.8-4.8"></path>
+          </svg>
+        </div>
+        <h1 class="hero-title" aria-label="InvestIQ"><span class="brand-invest">Invest</span><span class="brand-iq">IQ</span></h1>
+      </div>
+      <p class="hero-subtitle">Institutional-style research for individual investors</p>
+      <div class="title-divider"></div>
+
+      <!-- Centered Search Box Area -->
+      <div class="search-container">
+        <!-- Coverage Badge -->
+        <div class="scope-badge-wrap">
+          <span class="scope-badge">
+            <span class="scope-dot"></span>
+            COVERAGE: BANKING &amp; FINANCIAL STOCKS
+          </span>
+        </div>
+
+        <div class="search-box">
+          <div class="search-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </div>
+          <input id="si" class="search-input" type="text" placeholder="Search a bank or financial stock" value="{{ ticker|e }}" autofocus>
+          <button id="searchBtn" class="search-btn" onclick="executeSearch()">Search Ticker</button>
+        </div>
+
+        <div class="quick-chips-wrap">
+          <span class="chip-label">Quick select:</span>
+          <a href="/investiq/HDFCBANK" class="chip {% if ticker == 'HDFCBANK' %}active{% endif %}">HDFC Bank</a>
+          <a href="/investiq/ICICIBANK" class="chip {% if ticker == 'ICICIBANK' %}active{% endif %}">ICICI Bank</a>
+          <a href="/investiq/SBIN" class="chip {% if ticker == 'SBIN' %}active{% endif %}">State Bank of India</a>
+          <a href="/investiq/BANDHANBNK" class="chip {% if ticker == 'BANDHANBNK' %}active{% endif %}">Bandhan Bank</a>
+          <a href="/investiq/RBLBANK" class="chip {% if ticker == 'RBLBANK' %}active{% endif %}">RBL Bank</a>
+          <a href="/investiq/FEDERALBNK" class="chip {% if ticker == 'FEDERALBNK' %}active{% endif %}">Federal Bank</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- State Panels -->
+    <div id="loading" class="state-panel">
+      <div class="spinner"></div>
+      <div class="loader-title">Loading Research Intelligence</div>
+      <div class="loader-sub">Fetching latest valuation, findings, and financial metrics for {{ ticker|e }}...</div>
+    </div>
+
+    <div id="error" class="state-panel" style="display:none;"></div>
+
+    <!-- Main Content (Populated dynamically) -->
+    <div id="main" style="display:none;">
+
+      <!-- Company Header Card -->
+      <section class="company-header-card">
+        <div class="company-title-area">
+          <div class="company-name">
+            <span id="cn">{{ ticker|e }}</span>
+            <span class="ticker-tag" id="tk">{{ ticker|e }}</span>
+          </div>
+          <div class="company-meta">
+            <span class="meta-badge">Sector: <b id="sec">Financial Services</b></span>
+            <span class="meta-badge">Type: <b id="ct">Bank</b></span>
+            <span class="meta-badge">Generated: <b id="rd">-</b></span>
+          </div>
+        </div>
+        <div class="header-actions">
+          <a id="viewReportLink" href="/report/{{ ticker|e }}" class="btn-secondary" target="_blank">
+            <span>Detailed Print Report</span> &rarr;
+          </a>
+        </div>
+      </section>
+
+      <!-- Decision Matrix Panel -->
+      <section class="decision-panel">
+        <div class="panel-header">InvestIQ Decision Matrix</div>
+        <div class="decision-grid">
+          <div class="metric-card">
+            <div class="metric-label">Current Price</div>
+            <div class="metric-value" id="cp">-</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Fair Value</div>
+            <div class="metric-value" id="fv">-</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Implied Upside</div>
+            <div class="metric-value" id="up">-</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Valuation Verdict</div>
+            <div><span id="vb" class="badge-verdict">-</span></div>
+          </div>
+        </div>
+        <div class="assessment-strip">
+          <span class="assessment-title">Institutional Assessment &amp; Conviction:</span>
+          <span id="as" class="assessment-val">-</span>
+        </div>
+      </section>
+
+      <!-- Executive Summary -->
+      <section class="section-block" id="exSec" style="display:none;">
+        <h2 class="section-heading">Executive Summary</h2>
+        <div class="content-card" id="ex"></div>
+      </section>
+
+      <!-- Investment Thesis (Thesis at a Glance) -->
+      <section class="section-block" id="thSec">
+        <h2 class="section-heading">Investment Thesis at a Glance</h2>
+        <div class="thesis-grid" id="th"></div>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="dashboard-footer">
+    <div>InvestIQ &middot; Institutional Intelligence for Indian Banking &amp; Financial Equities</div>
+    <div class="footer-devel-label">Development dataset &bull; Synthetic research data &bull; Coverage: Banking &amp; Financial stocks</div>
+  </footer>
+
+  <script>
+    function esc(s) {
+      if (s === null || s === undefined) return "";
+      return String(s)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function formatINR(v) {
+      if (v === null || v === undefined || isNaN(Number(v))) return "N/A";
+      return "\u20B9" + Number(v).toLocaleString("en-IN", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    }
+
+    function executeSearch() {
+      var input = document.getElementById("si");
+      if (!input) return;
+      var val = input.value.trim().toUpperCase();
+      if (val) {
+        window.location.href = "/investiq/" + encodeURIComponent(val);
+      }
+    }
+
+    document.getElementById("si").addEventListener("keydown", function(e) {
+      if (e.key === "Enter") {
+        executeSearch();
+      }
+    });
+
+    async function loadDashboard() {
+      var currentTicker = "{{ ticker|e }}";
+      var loadingEl = document.getElementById("loading");
+      var errorEl = document.getElementById("error");
+      var mainEl = document.getElementById("main");
+
+      if (!currentTicker) {
+        loadingEl.style.display = "none";
+        errorEl.innerHTML = '<div class="error-card"><div class="error-icon">&#9888;</div><div class="error-title">Please Select a Stock</div><div class="error-msg">Enter a banking stock ticker above or pick from the supported coverage list.</div></div>';
+        errorEl.style.display = "block";
+        return;
+      }
+
+      try {
+        var response = await fetch("/api/v1/research/" + encodeURIComponent(currentTicker));
+        if (!response.ok) {
+          loadingEl.style.display = "none";
+          if (response.status === 404) {
+            errorEl.innerHTML = '<div class="error-card"><div class="error-icon">&#9888;</div><div class="error-title">No Snapshot for ' + esc(currentTicker) + '</div><div class="error-msg">This stock is currently not in the seeded research coverage database.</div><div class="error-suggestion">Supported banks with active research: <b>HDFCBANK</b>, <b>ICICIBANK</b>, <b>SBIN</b>, <b>BANDHANBNK</b>, <b>RBLBANK</b>, <b>FEDERALBNK</b>.</div></div>';
+          } else {
+            errorEl.innerHTML = '<div class="error-card"><div class="error-icon">&#9888;</div><div class="error-title">Failed to Load Research Data</div><div class="error-msg">Server returned status ' + response.status + '. Please check server logs.</div></div>';
+          }
+          errorEl.style.display = "block";
+          return;
+        }
+
+        var d = await response.json();
+        renderDashboard(d);
+
+      } catch (err) {
+        loadingEl.style.display = "none";
+        errorEl.innerHTML = '<div class="error-card"><div class="error-icon">&#9888;</div><div class="error-title">Connection Error</div><div class="error-msg">' + esc(err.message) + '</div><div class="error-suggestion">Make sure the InvestIQ server is running at http://localhost:8080.</div></div>';
+        errorEl.style.display = "block";
+      }
+    }
+
+    function renderDashboard(d) {
+      var loadingEl = document.getElementById("loading");
+      var mainEl = document.getElementById("main");
+
+      loadingEl.style.display = "none";
+      mainEl.style.display = "block";
+
+      // Header
+      document.getElementById("cn").textContent = d.company_name || d.ticker;
+      document.getElementById("tk").textContent = d.ticker;
+      document.getElementById("sec").textContent = d.sector || "Financial Services";
+      document.getElementById("ct").textContent = d.company_type || "Bank";
+      document.getElementById("rd").textContent = d.generated_at || "-";
+
+      var viewReportLink = document.getElementById("viewReportLink");
+      if (viewReportLink) {
+        viewReportLink.href = "/report/" + encodeURIComponent(d.ticker);
+      }
+
+      // Decision Grid
+      document.getElementById("cp").textContent = formatINR(d.current_price);
+      document.getElementById("fv").textContent = formatINR(d.blended_fair_value);
+
+      var upEl = document.getElementById("up");
+      if (d.upside_pct !== null && d.upside_pct !== undefined) {
+        var sign = d.upside_pct >= 0 ? "+" : "";
+        upEl.textContent = sign + Number(d.upside_pct).toFixed(1) + "%";
+        upEl.className = "metric-value " + (d.upside_pct >= 0 ? "val-positive" : "val-negative");
+      } else {
+        upEl.textContent = "N/A";
+        upEl.className = "metric-value val-neutral";
+      }
+
+      var vbEl = document.getElementById("vb");
+      var verdict = d.valuation_verdict || "N/A";
+      vbEl.textContent = verdict;
+      var verdictKey = verdict.toLowerCase().replace(/[^a-z]/g, "");
+      vbEl.className = "badge-verdict " + verdictKey;
+
+      document.getElementById("as").textContent = d.overall_assessment || "N/A";
+
+      // Executive Summary
+      var exSec = document.getElementById("exSec");
+      var exEl = document.getElementById("ex");
+      if (d.executive_summary) {
+        exEl.textContent = d.executive_summary;
+        exSec.style.display = "block";
+      }
+
+      // Thesis at a glance
+      var thEl = document.getElementById("th");
+      if (d.thesis_groups && d.thesis_groups.length) {
+        thEl.innerHTML = d.thesis_groups.map(function(grp) {
+          var cls = grp.css_class || "strength";
+          var points = (grp.bullet_points || []).map(function(p) {
+            return "<li>" + esc(p) + "</li>";
+          }).join("");
+          return '<div class="thesis-box ' + esc(cls) + '"><div class="thesis-box-title">' + esc(grp.label || "Thesis Point") + '</div><ul class="thesis-list">' + points + '</ul></div>';
+        }).join("");
+      } else {
+        document.getElementById("thSec").style.display = "none";
+      }
+    }
+
+    loadDashboard();
+  </script>
+</body>
+</html>
